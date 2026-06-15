@@ -199,7 +199,7 @@ pip-selfcheck.json
 .ionide
 
 
-maps/
+### models ###
 logs/
 eval_logs/
 models/
