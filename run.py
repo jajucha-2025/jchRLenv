@@ -19,8 +19,8 @@ from configs.training import (
 # ==========================
 # PATHS
 # ==========================
-MAP_PATH = "maps"
-
+MAP_PATH = "./maps"
+ 
 LOG_DIR = "./logs"
 MODEL_DIR = "./models"
 EVAL_DIR = "./eval_logs"

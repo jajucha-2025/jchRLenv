@@ -1,6 +1,8 @@
 import cv2
 import os
 
+from configs.observation import MAP_WIDTH_CM, MAP_HEIGHT_CM
+
 
 class MapLoader:
 
@@ -21,7 +23,7 @@ class MapLoader:
 
         self.map = cv2.imread(
             track_path,
-            cv2.IMREAD_GRAYSCALE
+            cv2.IMREAD_COLOR
         )
 
         if self.map is None:
@@ -44,8 +46,8 @@ class MapLoader:
         self.height = self.map.shape[0]
         self.width = self.map.shape[1]
 
-        self.world_width_cm = 1200.0
-        self.world_height_cm = 700.0
+        self.world_width_cm = MAP_WIDTH_CM
+        self.world_height_cm = MAP_HEIGHT_CM
 
         self.cm_per_px_x = (
             self.world_width_cm

@@ -1,23 +1,33 @@
 import json
 import math
+import os
 
 from configs.env import CHECKPOINT_RADIUS_CM, FINISH_RADIUS_CM
+
+from env.map_loader import MapLoader
 
 
 class CheckpointManager:
 
-    def __init__(self, path):
+    def __init__(self, map_dir: str):
+        
+        path = os.path.join(
+            map_dir,
+            "track.json"
+        )
 
         with open(path, "r") as f:
             self.track_data = json.load(f)
 
+        self.map_loader = MapLoader(map_dir)
+
         self.spawn = self.track_data["spawn"]
-
         self.finish = self.track_data["finish"]
+        self.checkpoints = self.track_data["checkpoints"]
 
-        self.checkpoints = self.track_data[
-            "checkpoints"
-        ]
+        self.spawn = self.dict_pixel_to_cm(self.spawn)
+        self.finish = self.dict_pixel_to_cm(self.finish)
+        self.checkpoints = self.checkpoint_pixel_to_cm(self.checkpoints)
 
         self.current_idx = 0
 
@@ -101,3 +111,22 @@ class CheckpointManager:
             self.current_idx
             / len(self.checkpoints)
         )
+
+    def dict_pixel_to_cm(self, data):
+
+        cx = data["x"] * self.map_loader.cm_per_px_x
+        cy = data["y"] * self.map_loader.cm_per_px_y
+
+        data["x"] = cx
+        data["y"] = cy
+
+        return data
+
+
+    def checkpoint_pixel_to_cm(self, checkpoint):
+
+        for i in range(len(checkpoint)):
+
+            checkpoint[i] = self.dict_pixel_to_cm(checkpoint[i])
+
+        return checkpoint

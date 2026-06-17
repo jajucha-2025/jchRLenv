@@ -16,6 +16,8 @@ from env.checkpoint_manager import CheckpointManager
 from env.reward_calculator import RewardCalculator
 from env.frame_stack import FrameStack
 
+from render.renderer import Renderer
+
 
 class JajuchaEnv(gym.Env):
 
@@ -50,7 +52,7 @@ class JajuchaEnv(gym.Env):
 
         self.checkpoint_manager = (
             CheckpointManager(
-                f"{map_dir}/track.json"
+                map_dir
             )
         )
 
@@ -89,6 +91,10 @@ class JajuchaEnv(gym.Env):
             )
         )
 
+        self.render_enable = RENDER_ENABLE
+
+        self.render_interval = RENDER_INTEVAL
+
         self.frame_stack = (
             FrameStack(
                 FRAME_STACK
@@ -124,9 +130,7 @@ class JajuchaEnv(gym.Env):
         obs = (
             self.observation_builder
             .build(
-                self.car.x,
-                self.car.y,
-                self.car.theta
+                self.car
             )
         )
 
@@ -136,6 +140,16 @@ class JajuchaEnv(gym.Env):
         )
 
         return obs, {}
+
+    def render(
+        self,
+        info
+    ):
+
+        self.renderer.show(
+            self.car,
+            info
+        )
 
     def step(
         self,
@@ -249,15 +263,40 @@ class JajuchaEnv(gym.Env):
             "theta":
             self.car.theta,
 
+            "speed_cmd":
+            speed_cmd,
+
+            "steer_cmd":
+            steer_cmd,
+
             "checkpoint_idx":
             self.checkpoint_manager.current_idx,
 
             "progress":
             self.checkpoint_manager.progress(),
 
+            "step":
+            self.step_count,
+
+            "reward": 
+            reward,
+
             "line_touched":
             line_touched
         }
+
+        if (
+            self.render_enabled
+            and
+            self.step_count
+            % self.render_interval
+            == 0
+        ):
+
+            self.render(
+                obs[-1],
+                info
+            )
 
         return (
             obs,

@@ -2,6 +2,8 @@ import math
 import cv2
 import numpy as np
 
+from env.observation_builder import ObservationBuilder
+
 from render.colors import *
 
 from configs.observation import (
@@ -29,10 +31,7 @@ class Renderer:
         car
     ):
 
-        frame = cv2.cvtColor(
-            self.map_loader.map,
-            cv2.COLOR_GRAY2BGR
-        )
+        frame = self.map_loader.map
 
         self._draw_checkpoints(frame)
 
@@ -40,18 +39,81 @@ class Renderer:
 
         self._draw_observation_fov(frame, car)
 
+        frame = cv2.resize(
+            frame,
+            None,
+            fx=2,
+            fy=2,
+            interpolation=cv2.INTER_NEAREST
+        )
+
         return frame
 
     def show(
         self,
-        car
+        car,
+        info = {}
     ):
 
-        frame = self.draw(car)
+        map_frame = self.draw(car)
+
+        observation_builder = ObservationBuilder(self.map_loader)
+
+        obs = observation_builder.build(car)
+
+        obs_frame = cv2.resize(
+            obs,
+            (420, 480),
+            interpolation=cv2.INTER_NEAREST
+        )
+
+        info_frame = np.zeros(
+            (480, 420, 3),
+            dtype=np.uint8
+        )
+
+        lines = [
+
+            f"reward : {info.get('reward', 0):.2f}",
+            f"x      : {car.x:.1f}",
+            f"y      : {car.y:.1f}",
+            f"theta  : {car.theta:.2f}",
+            f"cp     : {info.get('checkpoint_idx', 0)}",
+            f"speed  : {info.get('speed_cmd', 0)}",
+            f"steer  : {info.get('steer_cmd', 0)}",
+            f"step   : {info.get('step', 0)}"
+
+        ]
+
+        y = 40
+
+        for text in lines:
+
+            cv2.putText(
+                info_frame,
+                text,
+                (20, y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (255, 255, 255),
+                2
+            )
+
+            y += 40
 
         cv2.imshow(
-            "jajucha_rl",
-            frame
+            "Map",
+            map_frame
+        )
+
+        cv2.imshow(
+            "Observation",
+            obs_frame
+        )
+
+        cv2.imshow(
+            "Info",
+            info_frame
         )
 
         cv2.waitKey(1)
@@ -151,6 +213,61 @@ class Renderer:
         if self.checkpoint_manager is None:
             return
 
+
+        spawn = self.checkpoint_manager.spawn
+        finish = self.checkpoint_manager.finish
+
+        spx, spy = self.map_loader.world_to_pixel(spawn["x"], spawn["y"])
+        fpx, fpy = self.map_loader.world_to_pixel(finish["x"], finish["y"])
+
+        cv2.circle(
+            frame,
+            (
+                int(spx),
+                int(spy)
+            ),
+            10,
+            GREEN,
+            -1
+        )
+
+        cv2.putText(
+            frame,
+            "S",
+            (
+                int(spx) + 10,
+                int(spy)
+            ),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            GREEN,
+            2
+        )
+
+        cv2.circle(
+            frame,
+            (
+                int(fpx),
+                int(fpy)
+            ),
+            10,
+            RED,
+            -1
+        )
+
+        cv2.putText(
+            frame,
+            "F",
+            (
+                int(fpx) + 10,
+                int(fpy)
+            ),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.6,
+            RED,
+            2
+        )
+
         for idx, point in enumerate(
             self.checkpoint_manager.checkpoints
         ):
@@ -160,10 +277,10 @@ class Renderer:
 
             px, py = self.map_loader.world_to_pixel(x, y)
 
-            color = YELLOW
+            color = BLUE
 
             if idx < self.checkpoint_manager.current_idx:
-                color = GREEN
+                color = YELLOW
 
             cv2.circle(
                 frame,

@@ -24,12 +24,10 @@ class ObservationBuilder:
 
     def build(
         self,
-        x_cm: float,
-        y_cm: float,
-        theta: float
+        car
     ):
 
-        heading = theta + np.pi / 2
+        heading = car.theta + np.pi / 2
 
         forward_x = np.cos(heading)
         forward_y = np.sin(heading)
@@ -52,13 +50,13 @@ class ObservationBuilder:
             for col, side in enumerate(self.side_grid):
 
                 world_x[row, col] = (
-                    x_cm
+                    car.x
                     + forward_x * front
                     + left_x * side
                 )
 
                 world_y[row, col] = (
-                    y_cm
+                    car.y
                     + forward_y * front
                     + left_y * side
                 )
