@@ -241,9 +241,7 @@ class JajuchaEnv(gym.Env):
         obs = (
             self.observation_builder
             .build(
-                self.car.x,
-                self.car.y,
-                self.car.theta
+                self.car
             )
         )
 
