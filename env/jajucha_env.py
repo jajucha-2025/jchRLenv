@@ -91,7 +91,7 @@ class JajuchaEnv(gym.Env):
             )
         )
 
-        self.render_enable = RENDER_ENABLE
+        self.render_enabled = RENDER_ENABLED
 
         self.render_interval = RENDER_INTEVAL
 
