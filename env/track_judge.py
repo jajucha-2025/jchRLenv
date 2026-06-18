@@ -5,10 +5,12 @@ class TrackJudge:
 
     def __init__(
         self,
-        line_mask
+        map_loader
     ):
 
-        self.line_mask = line_mask
+        self.map_loader = map_loader
+
+        self.line_mask = self.map_loader.line_mask
 
     def wheel_positions(
         self,
@@ -56,10 +58,12 @@ class TrackJudge:
         car
     ):
 
-        for wx, wy in self.wheel_positions(car):
+        for wx, wy in car.wheel_positions():
 
-            px = int(wx)
-            py = int(wy)
+            px, py = self.map_loader.world_to_pixel(wx, wy)
+
+            px = int(px)
+            py = int(py)
 
             if (
                 px < 0

@@ -104,8 +104,8 @@ eval_callback = EvalCallback(
 # ==========================
 # TRAIN
 # ==========================
-# TOTAL_TIMESTEPS = 1_000_000
-TOTAL_TIMESTEPS = 20_000
+TOTAL_TIMESTEPS = 1_000_000
+# TOTAL_TIMESTEPS = 20_000
 
 print("\n==============================")
 print("Jajucha RL Training Start")

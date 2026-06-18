@@ -31,7 +31,7 @@ class Renderer:
         car
     ):
 
-        frame = self.map_loader.map
+        frame = self.map_loader.map.copy()
 
         self._draw_checkpoints(frame)
 
@@ -75,13 +75,15 @@ class Renderer:
         lines = [
 
             f"reward : {info.get('reward', 0):.2f}",
+            f"ts     : {info.get('total_score', 0):.2f}",
             f"x      : {car.x:.1f}",
             f"y      : {car.y:.1f}",
             f"theta  : {car.theta:.2f}",
             f"cp     : {info.get('checkpoint_idx', 0)}",
             f"speed  : {info.get('speed_cmd', 0)}",
             f"steer  : {info.get('steer_cmd', 0)}",
-            f"step   : {info.get('step', 0)}"
+            f"step   : {info.get('step', 0)}",
+            f"lt     : {info.get('line_touched', 0)}"
 
         ]
 

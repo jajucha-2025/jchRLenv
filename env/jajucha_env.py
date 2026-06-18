@@ -46,7 +46,7 @@ class JajuchaEnv(gym.Env):
 
         self.track_judge = (
             TrackJudge(
-                self.map_loader.line_mask
+                self.map_loader
             )
         )
 
@@ -64,10 +64,12 @@ class JajuchaEnv(gym.Env):
 
         self.step_count = 0
 
+        self.episode_reward = 0.0
+
         self.action_space = (
             spaces.Box(
                 low=np.array(
-                    [-30, -10],
+                    [1, -10],
                     dtype=np.float32
                 ),
                 high=np.array(
@@ -91,6 +93,8 @@ class JajuchaEnv(gym.Env):
             )
         )
 
+        self.renderer = Renderer(self.map_loader, self.checkpoint_manager)
+
         self.render_enabled = RENDER_ENABLED
 
         self.render_interval = RENDER_INTEVAL
@@ -113,6 +117,8 @@ class JajuchaEnv(gym.Env):
         )
 
         self.step_count = 0
+
+        self.episode_reward = 0.0
 
         self.checkpoint_manager.reset()
 
@@ -159,7 +165,7 @@ class JajuchaEnv(gym.Env):
         speed_cmd = float(
             np.clip(
                 action[0],
-                -30,
+                -10,
                 30
             )
         )
@@ -233,6 +239,8 @@ class JajuchaEnv(gym.Env):
             )
         )
 
+        self.episode_reward += reward
+
         truncated = (
             self.step_count
             >= MAX_STEPS
@@ -276,14 +284,17 @@ class JajuchaEnv(gym.Env):
             "step":
             self.step_count,
 
-            "reward": 
+            "reward":
             reward,
+
+            "total_score":
+            self.episode_reward,
 
             "line_touched":
             line_touched
         }
 
-        if (
+        '''if (
             self.render_enabled
             and
             self.step_count
@@ -291,10 +302,14 @@ class JajuchaEnv(gym.Env):
             == 0
         ):
 
+            print("RENDER")
+
             self.render(
                 obs[-1],
                 info
-            )
+            )'''
+        #if self.step_count != 1:
+        self.render(info)
 
         return (
             obs,
