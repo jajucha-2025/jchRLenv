@@ -83,6 +83,7 @@ class Renderer:
             f"speed  : {info.get('speed_cmd', 0)}",
             f"steer  : {info.get('steer_cmd', 0)}",
             f"step   : {info.get('step', 0)}",
+            f"ns     : {info.get('total_step', 0)}",
             f"lt     : {info.get('line_touched', 0)}"
 
         ]

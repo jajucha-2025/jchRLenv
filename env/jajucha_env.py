@@ -64,20 +64,15 @@ class JajuchaEnv(gym.Env):
 
         self.step_count = 0
 
+        self.total_step = 0
+
         self.episode_reward = 0.0
 
-        self.action_space = (
-            spaces.Box(
-                low=np.array(
-                    [1, -10],
-                    dtype=np.float32
-                ),
-                high=np.array(
-                    [30, 10],
-                    dtype=np.float32
-                ),
-                dtype=np.float32
-            )
+        self.action_space = spaces.MultiDiscrete(
+            [
+                18,  # speed 3~20  -30/30
+                21   # steer -10~10  -10/10
+            ]
         )
 
         self.observation_space = (
@@ -162,20 +157,12 @@ class JajuchaEnv(gym.Env):
         action
     ):
 
-        speed_cmd = float(
-            np.clip(
-                action[0],
-                -10,
-                30
-            )
+        speed_cmd = (
+            int(action[0]) + 3
         )
 
-        steer_cmd = float(
-            np.clip(
-                action[1],
-                -10,
-                10
-            )
+        steer_cmd = (
+            int(action[1]) - 10
         )
 
         speed_cm_s = (
@@ -209,6 +196,7 @@ class JajuchaEnv(gym.Env):
         )
 
         self.step_count += 1
+        self.total_step += 1
 
         checkpoint_passed = (
             self.checkpoint_manager
@@ -284,6 +272,9 @@ class JajuchaEnv(gym.Env):
             "step":
             self.step_count,
 
+            "total_step":
+            self.total_step,
+
             "reward":
             reward,
 
@@ -294,7 +285,7 @@ class JajuchaEnv(gym.Env):
             line_touched
         }
 
-        '''if (
+        if (
             self.render_enabled
             and
             self.step_count
@@ -302,14 +293,7 @@ class JajuchaEnv(gym.Env):
             == 0
         ):
 
-            print("RENDER")
-
-            self.render(
-                obs[-1],
-                info
-            )'''
-        #if self.step_count != 1:
-        self.render(info)
+            self.render(info)
 
         return (
             obs,

@@ -18,7 +18,7 @@ class MapLoader:
 
         line_mask_path = os.path.join(
             map_dir,
-            "line_mask.png"
+            "line_mask_sf.png"
         )
 
         self.map = cv2.imread(

@@ -1,5 +1,7 @@
 import os
 import time
+import cv2
+import torch
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import (
@@ -16,11 +18,17 @@ from configs.training import (
 )
 
 
+torch.set_num_threads(2)
+torch.set_num_interop_threads(1)
+
+cv2.setNumThreads(1)
+
+
 # ==========================
 # PATHS
 # ==========================
 MAP_PATH = "./maps"
- 
+
 LOG_DIR = "./logs"
 MODEL_DIR = "./models"
 EVAL_DIR = "./eval_logs"
@@ -65,9 +73,9 @@ model = PPO(
     verbose=1,
 
     learning_rate=3e-4,
-    n_steps=2048,
-    batch_size=256,
-    n_epochs=10,
+    n_steps=512,
+    batch_size=64,
+    n_epochs=5,
 
     gamma=0.99,
     gae_lambda=0.95,
@@ -104,7 +112,7 @@ eval_callback = EvalCallback(
 # ==========================
 # TRAIN
 # ==========================
-TOTAL_TIMESTEPS = 1_000_000
+TOTAL_TIMESTEPS = 10_000_000
 # TOTAL_TIMESTEPS = 20_000
 
 print("\n==============================")
